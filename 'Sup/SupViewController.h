@@ -7,7 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+@import CoreLocation;
+@import CoreBluetooth;
 
-@interface SupViewController : UIViewController
+@interface SupViewController : UIViewController <CLLocationManagerDelegate, CBPeripheralManagerDelegate, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate>
 
 @end

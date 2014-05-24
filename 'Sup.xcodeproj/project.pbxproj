@@ -22,6 +22,7 @@
 		9216411D192FF3F300335D9F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 921640FC192FF3F300335D9F /* UIKit.framework */; };
 		92164125192FF3F300335D9F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 92164123192FF3F300335D9F /* InfoPlist.strings */; };
 		92164127192FF3F300335D9F /* _SupTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 92164126192FF3F300335D9F /* _SupTests.m */; };
+		92164132192FF99300335D9F /* SupUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 92164131192FF99300335D9F /* SupUser.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,8 @@
 		92164122192FF3F300335D9F /* 'SupTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "'SupTests-Info.plist"; sourceTree = "<group>"; };
 		92164124192FF3F300335D9F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		92164126192FF3F300335D9F /* _SupTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = _SupTests.m; sourceTree = "<group>"; };
+		92164130192FF99300335D9F /* SupUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupUser.h; sourceTree = "<group>"; };
+		92164131192FF99300335D9F /* SupUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SupUser.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +124,8 @@
 				92164110192FF3F300335D9F /* SupViewController.h */,
 				92164111192FF3F300335D9F /* SupViewController.m */,
 				92164113192FF3F300335D9F /* Images.xcassets */,
+				92164130192FF99300335D9F /* SupUser.h */,
+				92164131192FF99300335D9F /* SupUser.m */,
 				921640FF192FF3F300335D9F /* Supporting Files */,
 			);
 			path = "'Sup";
@@ -257,6 +262,7 @@
 				92164105192FF3F300335D9F /* main.m in Sources */,
 				92164112192FF3F300335D9F /* SupViewController.m in Sources */,
 				92164109192FF3F300335D9F /* SupAppDelegate.m in Sources */,
+				92164132192FF99300335D9F /* SupUser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
