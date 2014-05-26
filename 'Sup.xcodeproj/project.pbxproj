@@ -208,6 +208,13 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = ahogue;
 				TargetAttributes = {
+					921640F4192FF3F300335D9F = {
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
+					};
 					92164118192FF3F300335D9F = {
 						TestTargetID = 921640F4192FF3F300335D9F;
 					};

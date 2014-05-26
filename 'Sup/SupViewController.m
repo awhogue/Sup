@@ -10,13 +10,11 @@
 #import "SupUser.h"
 
 static NSString * const kUUID = @"63694B2B-2712-46E7-A333-E44E13B497F1";
-static NSString * const kIdentifier = @"org.secondthought.SupBeaconRegion";
-static NSString * const kUserCellIdentifier = @"nearbyUser";
+static NSString * const kIdentifier = @"SupBeaconIdentifier";
+static NSString * const kUserCellIdentifier = @"NearbyUserCell";
 
 // NSUserDefaults keys
 static NSString * const kRegisteredUsernameKey = @"user";
-
-
 
 @interface SupViewController ()
 
@@ -27,8 +25,6 @@ static NSString * const kRegisteredUsernameKey = @"user";
 @property (nonatomic, strong) CLBeaconRegion *beaconRegion;
 @property (nonatomic, strong) CBPeripheralManager *peripheralManager;
 @property (nonatomic, strong) CLLocationManager *locationManager;
-@property (nonatomic, strong) NSNumber *beaconMajorID;
-@property (nonatomic, strong) NSNumber *beaconMinorID;
 
 @property (nonatomic, strong) NSArray *nearbyUsers;
 
@@ -42,13 +38,6 @@ static NSString * const kRegisteredUsernameKey = @"user";
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.userDefaults = [NSUserDefaults standardUserDefaults];
-    NSString* username = [self.userDefaults stringForKey:kRegisteredUsernameKey];
-    if (username != nil) {
-        self.usernameTextField.text = username;
-        [self userRegistered];
-    }
-    
     if (!self.peripheralManager) {
         self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self
                                                                          queue:nil
@@ -56,10 +45,16 @@ static NSString * const kRegisteredUsernameKey = @"user";
     }
 
     [self initDummyData];
-    [self turnOnAdvertising];
 
     self.usernameTextField.delegate = self;
     self.nearbyUserTable.dataSource = self;
+
+    self.userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* username = [self.userDefaults stringForKey:kRegisteredUsernameKey];
+    if (username != nil) {
+        self.usernameTextField.text = username;
+        [self userRegistered];
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -85,13 +80,8 @@ static NSString * const kRegisteredUsernameKey = @"user";
     NSLog(@"SupUser %@,%@,%@ (reversed: %@)", self.theUser.username, self.theUser.major, self.theUser.minor,
           [self.theUser majorMinorToUsername:self.theUser.major withMinor:self.theUser.minor]);
     [self.userDefaults setObject:self.theUser.username forKey:kRegisteredUsernameKey];
+    [self turnOnAdvertising];
     [self startRanging];
-}
-
-- (void)setupMajorMinorIdentifiers {
-    self.beaconMajorID = self.theUser.major;
-    self.beaconMinorID = self.theUser.minor;
-    NSLog(@"Got major,minor IDs: %@,%@", self.beaconMajorID, self.beaconMinorID);
 }
 
 - (void)startRanging
@@ -100,8 +90,6 @@ static NSString * const kRegisteredUsernameKey = @"user";
         NSLog(@"Not turning on ranging until registered");
         return;
     }
-    
-    [self setupMajorMinorIdentifiers];
     
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
@@ -130,11 +118,12 @@ static NSString * const kRegisteredUsernameKey = @"user";
     
     NSUUID *proximityUUID = [[NSUUID alloc] initWithUUIDString:kUUID];
     self.beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:proximityUUID
-                                                                major:[self.beaconMajorID integerValue]
-                                                                minor:[self.beaconMinorID integerValue]
+                                                                major:[self.theUser.major integerValue]
+                                                                minor:[self.theUser.minor integerValue]
                                                            identifier:kIdentifier];
-    NSLog(@"startMonitoringForRegion %@", self.beaconRegion);
-    [self.locationManager startMonitoringForRegion:self.beaconRegion];
+    NSLog(@"Created beacon region");
+    //NSLog(@"startMonitoringForRegion %@", self.beaconRegion);
+    //[self.locationManager startMonitoringForRegion:self.beaconRegion];
 }
 
 #pragma mark Beacon Broadcasting
@@ -145,17 +134,22 @@ static NSString * const kRegisteredUsernameKey = @"user";
         NSLog(@"Peripheral manager is off.");
         return;
     }
-    /*
+    
+    if (!self.theUser) {
+        NSLog(@"Not turning on advertising - user is null");
+        return;
+    }
+    
     CLBeaconRegion *region = [[CLBeaconRegion alloc] initWithProximityUUID:self.beaconRegion.proximityUUID
-                                                                     major:[self.beaconMajorID integerValue]
-                                                                     minor:[self.beaconMinorID integerValue]
+                                                                     major:[self.theUser.major integerValue]
+                                                                     minor:[self.theUser.minor integerValue]
                                                                 identifier:self.beaconRegion.identifier];
-     */
-    self.beaconRegion.notifyEntryStateOnDisplay = YES;
-    NSDictionary *beaconPeripheralData = [self.beaconRegion peripheralDataWithMeasuredPower:nil];
+    //[self createBeaconRegion];
+    region.notifyEntryStateOnDisplay = YES;
+    NSDictionary *beaconPeripheralData = [region peripheralDataWithMeasuredPower:nil];
     [self.peripheralManager startAdvertising:beaconPeripheralData];
     
-    NSLog(@"Turning on advertising for region: %@.", self.beaconRegion);
+    NSLog(@"Turning on advertising for region: %@.", region);
 }
 
 - (void)peripheralManagerDidStartAdvertising:(CBPeripheralManager *)peripheralManager error:(NSError *)error
@@ -200,7 +194,7 @@ static NSString * const kRegisteredUsernameKey = @"user";
 - (void)locationManager:(CLLocationManager *)manager
         didRangeBeacons:(NSArray *)beacons
                inRegion:(CLBeaconRegion *)region {
-    NSLog(@"didRangeBeacons (%lu)", (unsigned long)[beacons count]);
+    NSLog(@"didRangeBeacons (%lu) %@", (unsigned long)[beacons count], region);
     NSMutableArray *users = [[NSMutableArray alloc] init];
     for (int ii = 0; ii < [beacons count]; ii++) {
         [users addObject:[[SupUser alloc] initFromCLBeacon:[beacons objectAtIndex:ii]]];
