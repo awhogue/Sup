@@ -18,6 +18,6 @@
 
 -(SupUser*)initFromCLBeacon:(CLBeacon*)beacon;
 -(SupUser*)initFromUsername:(NSString*)username;
--(NSString*)numberToUsername:(NSNumber*)number;
+-(NSString*)majorMinorToUsername:(NSNumber*)major withMinor:(NSNumber*)minor;
 
 @end

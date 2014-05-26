@@ -13,14 +13,15 @@
 -(SupUser*)initFromCLBeacon:(CLBeacon*)beacon {
     self.major = beacon.major;
     self.minor = beacon.minor;
-    self.username = [self numberToUsername:beacon.minor];
+    self.username = [self majorMinorToUsername:beacon.major withMinor:beacon.minor];
     return self;
 }
 
 -(SupUser*)initFromUsername:(NSString*)username {
-    self.major = [NSNumber numberWithUnsignedInt:12345];
-    self.minor = [self usernameToNumber:username];
     self.username = username;
+    NSNumber* decoded = [self usernameToNumber:username];
+    self.major = [NSNumber numberWithInt:(decoded.intValue >> 16)];
+    self.minor = [NSNumber numberWithInt:(decoded.intValue & 65535)];
     return self;
 }
 
@@ -44,9 +45,9 @@
     return [NSNumber numberWithInt:final];
 }
 
--(NSString*)numberToUsername:(NSNumber*)number {
+-(NSString*)majorMinorToUsername:(NSNumber*)major withMinor:(NSNumber*)minor {
     int mask = 31;  // 11111
-    int num = [number intValue];
+    int num = ([major intValue] << 16) + [minor intValue];
     int codes[6] = {
         num >> 25 & mask,
         num >> 20 & mask,
